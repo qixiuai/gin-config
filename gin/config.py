@@ -1417,6 +1417,24 @@ def register_file_reader(*args):
     raise TypeError(err_str.format(len(args)))
 
 
+def xml_to_config_str(config_file):
+    """ parse xml config file to Gin config string
+
+    Args:
+      config_file: The path to a Gin config xml file
+    
+    Returns:
+      config_string: Gin config string
+    """
+    import xml.etree.ElementTree as ET
+    tree = ET.parse(config_file)
+    root = tree.getroot()
+    config_str = ""
+    for item in root.getchildren():
+        config_str = config_str + item.tag + ' = ' + item.text.strip() + '\n'
+    return config_str
+    
+
 def parse_config_file(config_file, skip_unknown=False):
   """Parse a Gin config file.
 
@@ -1433,7 +1451,11 @@ def parse_config_file(config_file, skip_unknown=False):
   for reader, existence_check in _FILE_READERS:
     if existence_check(config_file):
       with reader(config_file) as f:
-        parse_config(f, skip_unknown=skip_unknown)
+        if config_file[-4:] != '.xml':
+            parse_config(f, skip_unknown=skip_unknown)
+        else:
+            config_str = xml_to_config_str(config_file)
+            parse_config(config_str, skip_unknown=skip_unknown)
         return
   raise IOError('Unable to open file: {}'.format(config_file))
 

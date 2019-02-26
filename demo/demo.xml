@@ -1,0 +1,9 @@
+
+<config>
+  <model1param_num>
+    12
+  </model1param_num>
+  <model1param_str2>
+    "test"
+  </model1param_str2>
+</config>
